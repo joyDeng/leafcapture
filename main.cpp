@@ -11,8 +11,34 @@ int main(){
     // Serial arduino("/dev/tty.usbmodem14501");
     // std::cout<<"create arduino device, its connection is: "<<arduino.isConnected()<<std::endl;
 
-    ImageWindow window;
-    window.launchWindow();
+    ImageWindow *window;
+    window = new ImageWindow();
+
+    int start = 1;
+        // launch camera
+
+    // auto fc = [](Camera *camera, int *cc) {
+    //     printf("threading 1");
+    //     Camera::view(camera, cc);
+    // };
+
+    // std::cout<<"creating new thread"<<std::endl;
+
+    // std::thread th1(fc, window->m_camera, &start);
+
+    // std::cout<<"starting new thread"<<std::endl;
+
+    // // th1.start();
+
+    // std::cout<<"start to render"<<std::endl;
+
+    window->launchWindow(&start);
+
+    // th1.join();
+
+
+
+
     // while(1){
     //     std::cout<<"please enter light you want to trigger, 0, 1, 2, press e to escape" <<std::endl;
     //     char light;

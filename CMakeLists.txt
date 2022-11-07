@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.12)
-project(LeafCapture VERSION 0.0.1 DESCRIPTION "Leaf capturing control code")
+project(LeafCapture)
 
+#set(CMAKE_C_COMPILER clang)
+#set(CMAKE_CXX_COMPILER clang)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Boost)
 include_directories( ${Boost_INCLUDE_DIR})
+
+add_definitions(-DGL_SILENCE_DEPRECATION)
 
 
 #find_package(OpenGL REQUIRED)
