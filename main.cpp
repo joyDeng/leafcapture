@@ -6,9 +6,18 @@
 
 using namespace std;
 
+void photomode1(Camera *camera){
+    // Serial arduino("/dev/tty.usbmodem14501");
+    // arduino.sendChar("1")
+    camera->shot();
+    if(!camera->flush("test_light_1.png")){
+        printf("\n failed to write image \n");
+    }
+}
+
 int main(){
     std::cout<<"hello world"<<std::endl;
-    // Serial arduino("/dev/tty.usbmodem14501");
+   
     // std::cout<<"create arduino device, its connection is: "<<arduino.isConnected()<<std::endl;
 
     ImageWindow *window;
@@ -35,6 +44,7 @@ int main(){
     window->launchWindow(&start);
 
     // th1.join();
+    photomode1(window->m_camera);
 
 
 

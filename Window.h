@@ -73,7 +73,7 @@ class ImageWindow{
 
 
         // glfwMakeContextCurrent(window);
-        std::cout<<"writing data"<<std::endl;
+        // std::cout<<"writing data"<<std::endl;
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -104,10 +104,10 @@ class ImageWindow{
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, tex_handle);
             glBegin(GL_QUADS);
-                glTexCoord2d(0, 0); glVertex2i(0, 0);
-                glTexCoord2d(1, 0); glVertex2i(frame_width, 0);
-                glTexCoord2d(1, 1); glVertex2i(frame_width, frame_height);
-                glTexCoord2d(0, 1); glVertex2i(0, frame_height);
+                glTexCoord2d(0, 0); glVertex2i(0, frame_height);
+                glTexCoord2d(1, 0); glVertex2i(frame_width, frame_height);
+                glTexCoord2d(1, 1); glVertex2i(frame_width, 0);
+                glTexCoord2d(0, 1); glVertex2i(0, 0);
             glEnd();
             glDisable(GL_TEXTURE_2D);
 
@@ -125,9 +125,14 @@ class ImageWindow{
             glfwPollEvents();
         }
 
-        start = 0;
+        // start = 0;
 
         glfwTerminate();
         return true;
+    }
+
+    ~ImageWindow(){
+        free(m_camera);
+        free(window);
     }
 };

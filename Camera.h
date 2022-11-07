@@ -1,6 +1,6 @@
 #pragma once
 #include<iostream>
-#include<string>
+#include <string>
 #include <dc1394/dc1394.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -14,7 +14,7 @@ typedef enum CameraType{
     CCANON=1
 } CameraType;
 
-#define IMAGE_FILE_NAME "image.png"
+// #define IMAGE_FILE_NAME "image.png"
 
 class Camera{
     // CameraType m_type=CameraType::CCHAMELON;
@@ -33,6 +33,7 @@ class Camera{
     dc1394_t * m_d;
     dc1394camera_list_t *list;
     dc1394video_frame_t *new_frame;
+    dc1394video_frame_t *temp_frame;
 
     dc1394error_t err;
     bool created=false;
@@ -81,28 +82,35 @@ class Camera{
 
         int i;
         // select highest res mode:
+        printf("support %d modes \n", video_modes.num);
         for ( i=video_modes.num-1;i>=0;i--) {
-            if (!dc1394_is_video_mode_scalable(video_modes.modes[i])) {
+            // if (!dc1394_is_video_mode_scalable(video_modes.modes[i])) {
                 dc1394_get_color_coding_from_video_mode(camera,video_modes.modes[i], &coding);
-                if (coding==DC1394_COLOR_CODING_MONO8) {
+                std::cout<<"mode:"<<coding<<std::endl;
+                if (coding==361) { // DC1394_COLOR_CODING_MONO8
+                    // std::cout<<"mode:"<<coding<<std::endl;
                     video_mode=video_modes.modes[i];
                     break;
                 }
-            }
+            // }
         }
+        // video_mode = video_modes.modes[video_modes.num-1];
         if (i < 0) {
-            dc1394_log_error("Could not get a valid MONO8 mode");
+            dc1394_log_error("Could not get a valid mode");
             cleanup_and_exit(camera);
         }
+
+        // exit(0);
 
         err=dc1394_get_color_coding_from_video_mode(camera, video_mode,&coding);
         DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not get color coding");
 
         // get highest framerate
-        err=dc1394_video_get_supported_framerates(camera,video_mode,&framerates);
-        DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not get framrates");
-        framerate=framerates.framerates[framerates.num-1];
+        // err=dc1394_video_get_supported_framerates(camera,video_mode,&framerates);
+        // DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not get framrates");
+        // framerate=framerates.framerates[framerates.num-1];
         created = true;
+        std::cout<<"created"<<std::endl;
     }
 
     /*should excute this in parrallel*/
@@ -126,8 +134,8 @@ class Camera{
         err=dc1394_video_set_mode(camera, video_mode);
         DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not set video mode");
 
-        err=dc1394_video_set_framerate(camera, framerate);
-        DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not set framerate");
+        // err=dc1394_video_set_framerate(camera, framerate);
+        // DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not set framerate");
 
         err=dc1394_capture_setup(camera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
         DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not setup camera-\nmake sure that the video mode and framerate are\nsupported by your camera");
@@ -136,9 +144,16 @@ class Camera{
         // DC1394_ERR_CLN(err,dc1394_camera_free (camera),"cannot set shutter");
         // printf ("I: shutter is 50\n");
 
-        err = dc1394_feature_set_value (camera, DC1394_FEATURE_BRIGHTNESS, 150);
-        DC1394_ERR_CLN(err,dc1394_camera_free (camera),"cannot set brightness");
-        printf ("I: brightness is 150\n");
+        // err = dc1394_feature_set_value(camera, DC1394_FEATURE_TEMPERATURE, 1000);
+        // DC1394_ERR_CLN(err,dc1394_camera_free (camera),"cannot set temperature");
+        // printf ("I: brightness is 1000\n");
+        
+        uint32_t ubvalue;
+        uint32_t vrvalue;
+        dc1394_feature_whitebalance_get_value(camera, &ubvalue, &vrvalue);
+        printf("ubvalue = %d, vrvalue = %d", ubvalue, vrvalue);
+
+        dc1394_feature_whitebalance_set_value(camera, 750, vrvalue);
 
         // DC1394_FEATURE_FOCUS
         // err = dc1394_feature_set_value (camera, DC1394_FEATURE_FOCUS, 15);
@@ -187,29 +202,41 @@ class Camera{
         /*-----------------------------------------------------------------------
         *  save image as 'Image.pgm'
         *-----------------------------------------------------------------------*/
-        // imagefile=fopen(IMAGE_FILE_NAME, "wb");
-
-        // if( imagefile == NULL) {
-        //     perror( "Can't create '" IMAGE_FILE_NAME "'");
-        //     cleanup_and_exit(camera);
-        // }
+   
 
         dc1394_get_image_size_from_video_mode(camera, video_mode, &width, &height);
         // printf("got image size\n");
-        if(new_frame == nullptr) new_frame = (dc1394video_frame_t *) calloc(1,sizeof(dc1394video_frame_t));
+        if(temp_frame == nullptr) temp_frame = (dc1394video_frame_t *) calloc(1,sizeof(dc1394video_frame_t));
         // printf("new frame\n");
-        new_frame->color_coding=DC1394_COLOR_CODING_RGB8;
-        // printf("convert \n");
-        dc1394_convert_frames(frame, new_frame);
+        temp_frame->color_coding=DC1394_COLOR_CODING_RAW8;
+        memcpy(temp_frame, frame, sizeof(dc1394video_frame_t));
 
-        // printf("start enqueue\n");
         err=dc1394_capture_enqueue(camera, frame);
         DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not clean up frames");
+
+        // err=dc1394_capture_dequeue(camera, DC1394_CAPTURE_POLICY_POLL, &frame);
+
+        // DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not capture a frame");
+        // while(err){
+        //     err=dc1394_capture_dequeue(camera, DC1394_CAPTURE_POLICY_POLL, &frame);
+        //     printf("flushing");
+        //     if (frame == NULL) return;
+        // }
+
+        if(new_frame == nullptr) new_frame = (dc1394video_frame_t *) calloc(1,sizeof(dc1394video_frame_t));
+        new_frame->color_coding=DC1394_COLOR_CODING_RGB8;
+        // printf("convert \n");
+        // dc1394_convert_frames(frame, new_frame);
+        dc1394_debayer_frames(temp_frame, new_frame, DC1394_BAYER_METHOD_BILINEAR);
+
+        // printf("start enqueue\n");
+        
 
         // fprintf(imagefile,"P5\n%u %u 255\n", width, height);
         // fwrite(frame->image, 1, height*width, imagefile);
         // fclose(imagefile);
         // printf("wrote: " IMAGE_FILE_NAME "\n");
+
 
         /*-----------------------------------------------------------------------
         *  close camera
@@ -218,6 +245,23 @@ class Camera{
 
         // return;
     };
+
+    bool flush(std::string filename){
+        imagefile=fopen(filename.c_str(), "wb");
+
+        if( imagefile == NULL) {
+            printf( "Can't create %s", filename.c_str());
+            // cleanup_and_exit(camera);
+            return false;
+        }
+
+        fprintf(imagefile,"P6\n%u %u\n255\n", width, height);
+        fwrite((const char *)new_frame->image, 1, height*width*3, imagefile);
+        fclose(imagefile);
+        printf("wrote: %s \n", filename.c_str());
+        return true;
+    }
+
 
     ~Camera(){
         if(camera != nullptr){
@@ -231,11 +275,13 @@ class Camera{
             if(new_frame->image != nullptr){
                 free(new_frame->image);
                 free(new_frame);
+                free(temp_frame->image);
+                free(temp_frame);
             }
         }
     }
 
-    unsigned int width, height;
+    uint32_t width, height;
     dc1394video_frame_t *frame;
     // CameraType getType(){return m_type;}
 };
