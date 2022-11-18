@@ -121,6 +121,15 @@ class Camera{
         }
     }
 
+    void setShutterSpeed(int shutter_speed){
+        err=dc1394_video_set_framerate(camera, framerate);
+        DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not set framerate");
+
+        err = dc1394_feature_set_value (camera, DC1394_FEATURE_SHUTTER, shutter_speed);
+        DC1394_ERR_CLN(err,dc1394_camera_free (camera),"cannot set shutter");
+       std::cout<<"I: shutter is "<<shutter_speed<<" \n"<<std::endl;
+    }
+
     void setupCapture(int shutter_speed){
     /*-----------------------------------------------------------------------
      *  setup capture
@@ -137,23 +146,20 @@ class Camera{
         // err=dc1394_video_set_framerate(camera, framerate);
         // DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not set framerate");
 
-        err=dc1394_capture_setup(camera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
-        DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not setup camera-\nmake sure that the video mode and framerate are\nsupported by your camera");
-
         // err = dc1394_feature_set_value (camera, DC1394_FEATURE_SHUTTER, shutter_speed);
         // DC1394_ERR_CLN(err,dc1394_camera_free (camera),"cannot set shutter");
         // printf ("I: shutter is 50\n");
 
-        // err = dc1394_feature_set_value(camera, DC1394_FEATURE_TEMPERATURE, 1000);
-        // DC1394_ERR_CLN(err,dc1394_camera_free (camera),"cannot set temperature");
-        // printf ("I: brightness is 1000\n");
+        err = dc1394_feature_set_value(camera, DC1394_FEATURE_BRIGHTNESS, 10);
+        DC1394_ERR_CLN(err,dc1394_camera_free (camera),"cannot set temperature");
+        printf ("I: brightness is 10\n");
         
         uint32_t ubvalue;
         uint32_t vrvalue;
         dc1394_feature_whitebalance_get_value(camera, &ubvalue, &vrvalue);
         printf("ubvalue = %d, vrvalue = %d", ubvalue, vrvalue);
 
-        dc1394_feature_whitebalance_set_value(camera, 750, vrvalue);
+        dc1394_feature_whitebalance_set_value(camera, 780, vrvalue);
 
         // DC1394_FEATURE_FOCUS
         // err = dc1394_feature_set_value (camera, DC1394_FEATURE_FOCUS, 15);
@@ -176,6 +182,9 @@ class Camera{
     }
 
     void shot(){
+        err=dc1394_capture_setup(camera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
+        DC1394_ERR_CLN(err,cleanup_and_exit(camera),"Could not setup camera-\nmake sure that the video mode and framerate are\nsupported by your camera");
+
         // printf("start transmission\n");
         /*-----------------------------------------------------------------------
         *  have the camera start sending us data
@@ -237,7 +246,8 @@ class Camera{
         // fclose(imagefile);
         // printf("wrote: " IMAGE_FILE_NAME "\n");
 
-
+        dc1394_video_set_transmission(camera, DC1394_OFF);
+        dc1394_capture_stop(camera);
         /*-----------------------------------------------------------------------
         *  close camera
         *-----------------------------------------------------------------------*/

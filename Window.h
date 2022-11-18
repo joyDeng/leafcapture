@@ -50,7 +50,7 @@ class ImageWindow{
     }
 
 
-    bool launchWindow(int *start){
+    bool launchWindow(){
         if (!window)
         {
             glfwTerminate();
