@@ -13,8 +13,6 @@ using namespace boost::asio;
 
 #define numLight 7
 
-
-
 class Serial{
     bool connected=false;
     int id;
@@ -22,6 +20,7 @@ class Serial{
     // io_service m_io;
     string port_name;
     serial_port *m_port;
+
     public:
     Serial(string name):port_name(name){
         io_service io;
@@ -37,10 +36,14 @@ class Serial{
     };
 
     ~Serial(){
-        if (m_port->is_open()){
-            std::cout<<" now close the port "<<std::endl;
-            m_port->close();
-        }
+        // if(m_port != nullptr) delete m_port;
+                // if (m_port->is_open()){
+            // std::cout<<" now close the port "<<std::endl;
+            // m_port->close();
+            // std::cout<<" close port "<<std::endl;
+            // free(m_port);
+        // }
+        std::cout<<"deconstruct serial port"<<std::endl;
     }
 
     void sendChar(char *a) {

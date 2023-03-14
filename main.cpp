@@ -1,8 +1,13 @@
 #include<iostream>
 #include<string>
 #include "Serial.h"
-#include "Camera.h"
 #include "Window.h"
+#include "Capture.h"
+#include "Camera.h"
+#include "Camera2.h"
+
+#include <boost/filesystem.hpp>
+
 // #include ""
 
 using namespace std;
@@ -17,115 +22,62 @@ int main(int argc, char **argv){
     // std::cout<<"hello world"<<std::endl;
     // Serial arduino("/dev/tty.usbmodem14101");
     // std::cout<<"create arduino device, its connection is: "<<arduino.isConnected()<<std::endl;
-    
+    // Camera2 test2;
+    // Camera1 test1;
+
+    // test.shot();
+    // test.develop();
+
+    // test read 
+
+    // exit(0);
     std::string fileprefix="test_light_";
     if(argc > 1){
         fileprefix = std::string(argv[1]);
     }
 
+    std::string DATA_ROOT = "/home/dx/Research/leaf/data/";
+    std::string data_path = DATA_ROOT + fileprefix;
+    boost::filesystem::create_directories(data_path);
 
-    Serial arduino("/dev/tty.usbmodem14401");
+
+
+
+    Serial arduino("/dev/ttyACM0");
     char ret;
     arduino.readChar(&ret);
     if(ret=='R');
     arduino.turnOn(3);
 
-
     ImageWindow *window;
     window = new ImageWindow();
-
-
-
-    // int start = 1;
-        // launch camera
-
-    // auto fc = [](Camera *camera, int *cc) {
-    //     printf("threading 1");
-    //     Camera::view(camera, cc);
-    // };
-
-    // std::cout<<"creating new thread"<<std::endl;
-
-    // std::thread th1(fc, window->m_camera, &start);
-
-    // std::cout<<"starting new thread"<<std::endl;
-
-    // // th1.start();
-
-    // std::cout<<"start to render"<<std::endl;
-
     window->launchWindow();
+    
+    double start_exp = 10000;
+    double scale = 0.5f;
 
-
-    // Serial arduino("/dev/tty.usbmodem14401");
+    // window->m_camera->shotHDR(data_path+"/c", minexp, maxexp, (maxexp - minexp) / numImage, 1);
     arduino.turnOff(3);
+    // exit(0);
 
     // take a black image
-    std::this_thread::sleep_for (std::chrono::seconds(1));
-    window->m_camera->shot();
-    std::string name=fileprefix+"_black.png";
-    window->m_camera->flush(name.c_str());
-
+    // std::this_thread::sleep_for (std::chrono::seconds(1));
+    // std::string name=fileprefix+"_black";
+    // window->m_camera->shotblack(name, 2000, 100, 0);
+    // exit(0);
+    // window->m_camera->flush(name.c_str());
     
     // std::this_thread::sleep_for (std::chrono::seconds(2));
+    
     for(int i = 0 ; i < 7 ; i++){
         arduino.turnOn(i);
-        std::this_thread::sleep_for (std::chrono::seconds(1));
-        window->m_camera->shot();
-        name=fileprefix+std::to_string(i)+".png";
-        // std::this_thread::sleep_for (std::chrono::seconds(2));
-        printf("shot token\n");
-        if(!window->m_camera->flush(name.c_str())){
-            printf("\n failed to write image \n");
-        } else printf("written_\n");
-
+        for (int cid = 0 ; cid < window->m_camera->camera_number ; cid++){
+            std::this_thread::sleep_for (std::chrono::seconds(1));
+            window->m_camera->shotHDR(data_path+"/c"+std::to_string(cid)+"_l"+std::to_string(i), start_exp, scale, cid);
+            
+        }
         arduino.turnOff(i);
     }
 
-    // char ret;
-    // arduino.readChar(&ret);
-    // printf("ret %c \n ", ret);
-    // std::cout<<"receiving char: "<<ret<<std::endl;
-
-    // std::this_thread::sleep_for (std::chrono::seconds(2));
-
-
-
-
-
-    // arduino.sendChar('1');
-    // std::this_thread::sleep_for (std::chrono::seconds(2));
-
-    // window->m_camera->shot();
-    // std::this_thread::sleep_for (std::chrono::seconds(2));
-    // printf("shot token\n");
-    // if(!window->m_camera->flush("test_light_back.png")){
-    //     printf("\n failed to write image \n");
-    // }
-    // printf("written_ 1\n");
-
-
-    // while(1){
-    //     std::cout<<"please enter light you want to trigger, 0, 1, 2, press e to escape" <<std::endl;
-    //     char light;
-    //     std::cin>>light;
-    //     if (light == 'e') 
-    //         break;
-    //     if (light == '1' || light == '0' || light == '2'){
-    //         std::cout<<"turning on light 0"<<std::endl;
-    //         arduino.sendChar(light);
-    //     }else{
-    //         std::cout<<"invalid input, please enter again"<<std::endl;
-    //     }
-    // }
-
-    
-
-    // std::cout<<"turning on light 1"<<std::endl;
-    // arduino.sendChar('1');
-    // std::cout<<"checking camera"<<std::endl;
-    // arduino.sendChar('2');
-    // Camera cameras;
-    // std::cout<<"create usb camera, its type is: "<<camera0.getType()<<std::endl;
     return 0;
 }

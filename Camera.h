@@ -6,17 +6,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <inttypes.h>
-
-
-
-typedef enum CameraType{
-    CCHAMELON=0,
-    CCANON=1
-} CameraType;
+#include <cstring>
+#include "Capture.h"
 
 // #define IMAGE_FILE_NAME "image.png"
 
-class Camera{
+class Camera1 : public CaptureDevice{
     // CameraType m_type=CameraType::CCHAMELON;
     // ImageWindow m_viewer;
     FILE* imagefile;
@@ -50,7 +45,7 @@ class Camera{
     public:
 
 
-    Camera(){
+    Camera1(){
         m_d = dc1394_new();
         err = dc1394_camera_enumerate(m_d, &list);
         DC1394_ERR(err, "Failed to enumerate camera");
@@ -114,12 +109,12 @@ class Camera{
     }
 
     /*should excute this in parrallel*/
-    static void view(Camera *camera, int * stop){
-        while((*stop)!=0){
-            // printf("iteration %d \n");
-            camera->shot();
-        }
-    }
+    // static void view(Camera1 *camera, int * stop){
+    //     while((*stop)!=0){
+    //         // printf("iteration %d \n");
+    //         camera->shot();
+    //     }
+    // }
 
     void setShutterSpeed(int shutter_speed){
         err=dc1394_video_set_framerate(camera, framerate);
@@ -273,7 +268,7 @@ class Camera{
     }
 
 
-    ~Camera(){
+    ~Camera1(){
         if(camera != nullptr){
             dc1394_video_set_transmission(camera, DC1394_OFF);
             dc1394_capture_stop(camera);

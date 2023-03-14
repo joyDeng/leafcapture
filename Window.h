@@ -2,7 +2,7 @@
 // #include <glad/gl.h>
 #pragma once
 #include <GLFW/glfw3.h>
-#include "Camera.h"
+#include "Camera2.h"
 
 #include <chrono>
 #include <thread>
@@ -14,7 +14,7 @@ using namespace std::chrono;
 class ImageWindow{
     public:
     GLFWwindow* window;
-    Camera *m_camera;
+    Camera2 *m_camera;
     GLuint tex_handle;
     unsigned int width = 640;
     unsigned int height = 480;
@@ -25,20 +25,22 @@ class ImageWindow{
     /* Initialize the library */
         if (!glfwInit())
           exit(0);
-
-
        
-        m_camera = new Camera();
+        m_camera = new Camera2();
         if(m_camera->created){
-            m_camera->setupCapture(50);
+            // m_camera->setupCapture(50);
             auto start = high_resolution_clock::now();
             m_camera->shot();
+            m_camera->getImageSize();
+            
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
-            std::cout<<"takeing shot will spend us"<<duration.count()<<" ms"<<std::endl;
-            width = m_camera->width;
-            height = m_camera->height;
+            std::cout<<"takeing shot will spend us"<<duration.count()<<" us"<<std::endl;
+            width = m_camera->m_width;
+            height = m_camera->m_height;
+            std::cout<<"length: "<<width<<"x"<<height<<std::endl;
         }
+
      /* Create a windowed mode window and its OpenGL context */
         window = glfwCreateWindow(width, height, "Hello World", NULL, NULL);
 
@@ -60,8 +62,10 @@ class ImageWindow{
         std::cout<<"luanching window"<<std::endl;
         /* Make the window's context current */
         glfwMakeContextCurrent(window);
+
         int texture_width = width;
         int texture_height = height;
+
         // unsigned char data[texture_width * texture_height * 3];
         // for(int i=0 ; i < texture_width ; i++){
         //     for(int j=0 ; j < texture_height ; j++){
@@ -71,6 +75,13 @@ class ImageWindow{
         //     }
         // }
 
+        // unsigned char *dataptr;
+        // dataptr = (unsigned char *) m_camera->getImage(0);
+
+
+        float *dataptr;
+        dataptr = new float[m_camera->m_width * m_camera->m_height];
+        m_camera->getbuffer(dataptr);
 
         // glfwMakeContextCurrent(window);
         // std::cout<<"writing data"<<std::endl;
@@ -80,7 +91,7 @@ class ImageWindow{
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_camera->new_frame->image);
+        glTexImage2D(GL_TEXTURE_2D, 0,  GL_RED, texture_width, texture_height, 0,  GL_RED,  GL_FLOAT, dataptr);
 
 
         /* Loop until the user closes the window */
@@ -91,7 +102,9 @@ class ImageWindow{
 
             if(m_camera->created){
                 m_camera->shot();
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_camera->new_frame->image);
+                // dataptr = (unsigned char *) m_camera->getImage(0);
+                m_camera->getbuffer(dataptr);
+                glTexImage2D(GL_TEXTURE_2D, 0,  GL_RED, texture_width, texture_height, 0,  GL_RED,  GL_FLOAT, dataptr);
             }
             /* set up ortho projection */
             int frame_width, frame_height;
@@ -128,11 +141,14 @@ class ImageWindow{
         // start = 0;
 
         glfwTerminate();
+        delete dataptr;
         return true;
     }
 
     ~ImageWindow(){
-        free(m_camera);
+        printf("free m camera");
+        delete m_camera;
+        printf("free window");
         free(window);
     }
 };
