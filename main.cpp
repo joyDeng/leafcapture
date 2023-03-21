@@ -53,28 +53,16 @@ int main(int argc, char **argv){
     window = new ImageWindow();
     window->launchWindow();
     
-    double start_exp = 10000;
+    double start_exp = 400000;
     double scale = 0.5f;
 
-    // window->m_camera->shotHDR(data_path+"/c", minexp, maxexp, (maxexp - minexp) / numImage, 1);
     arduino.turnOff(3);
-    // exit(0);
-
-    // take a black image
-    // std::this_thread::sleep_for (std::chrono::seconds(1));
-    // std::string name=fileprefix+"_black";
-    // window->m_camera->shotblack(name, 2000, 100, 0);
-    // exit(0);
-    // window->m_camera->flush(name.c_str());
-    
-    // std::this_thread::sleep_for (std::chrono::seconds(2));
     
     for(int i = 0 ; i < 7 ; i++){
         arduino.turnOn(i);
-        for (int cid = 0 ; cid < window->m_camera->camera_number ; cid++){
+        for (int cid = window->m_camera->camera_number-1; cid >= 0  ; cid--){
             std::this_thread::sleep_for (std::chrono::seconds(1));
             window->m_camera->shotHDR(data_path+"/c"+std::to_string(cid)+"_l"+std::to_string(i), start_exp, scale, cid);
-            
         }
         arduino.turnOff(i);
     }

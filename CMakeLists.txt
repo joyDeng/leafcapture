@@ -43,7 +43,7 @@ add_subdirectory("ext/glfw")
 #     message("apple only")
 # endif()
 
-add_executable(banboo 
+add_executable(capture 
 Camera.h
 Capture.h
 Camera2.h
@@ -53,7 +53,7 @@ Serial.cpp
 Window.h
 main.cpp)
 
-add_executable(viewer 
+add_executable(saturate 
 Camera.h
 Capture.h
 Camera2.h
@@ -61,7 +61,7 @@ Camera.cpp
 Serial.h
 Serial.cpp
 Window.h
-viewer.cpp)
+test_exp.cpp)
 
 add_executable(calibrate 
 Camera.h
@@ -73,7 +73,7 @@ Serial.cpp
 Window.h
 calibrate.cpp)
 
-add_executable(turnoff 
+add_executable(turn 
 Camera.h
 Capture.h
 Camera2.h
@@ -107,21 +107,21 @@ list( APPEND DC_LIBS ${LIBDC1394_LIBRARY})
 
 message("VIMBA_LIBS = ${VIMBA_LIBS}")
 
-target_include_directories(banboo 
+target_include_directories(capture 
 PUBLIC ${VIMBA_INC_DIR}
 PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
 PUBLIC ${VIMBA_MES_INC_DIR}
 PUBLIC ${STB_INCLUDE} 
 PUBLIC ${OpenCV_INCLUDE_DIRS})
 
-target_include_directories(turnoff 
+target_include_directories(turn
 PUBLIC ${VIMBA_INC_DIR}
 PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
 PUBLIC ${VIMBA_MES_INC_DIR}
 PUBLIC ${STB_INCLUDE} 
 PUBLIC ${OpenCV_INCLUDE_DIRS})
 
-target_include_directories(viewer 
+target_include_directories(saturate 
 PUBLIC ${VIMBA_INC_DIR}
 PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
 PUBLIC ${VIMBA_MES_INC_DIR}
@@ -138,7 +138,7 @@ PUBLIC ${OpenCV_INCLUDE_DIRS})
 
 # -lboost_filesystem -lboost_system
 
-target_link_libraries(banboo LINK_PUBLIC 
+target_link_libraries(capture LINK_PUBLIC 
 ${Boost_LIBRARIES} 
 ${Boost_FILESYSTEM_LIBRARY}
 ${Boost_SYSTEM_LIBRARY}
@@ -154,7 +154,7 @@ ${OpenCV_LIBS}
 ${DC_LIBS}
 ${VIMBA_LIBS})
 
-target_link_libraries(turnoff LINK_PUBLIC 
+target_link_libraries(turn LINK_PUBLIC 
 ${Boost_LIBRARIES} 
 ${Boost_FILESYSTEM_LIBRARY}
 ${Boost_SYSTEM_LIBRARY}
@@ -170,7 +170,7 @@ ${OpenCV_LIBS}
 ${DC_LIBS}
 ${VIMBA_LIBS})
 
-target_link_libraries(viewer LINK_PUBLIC 
+target_link_libraries(saturate LINK_PUBLIC 
 ${Boost_LIBRARIES} 
 ${Boost_FILESYSTEM_LIBRARY}
 ${Boost_SYSTEM_LIBRARY}
@@ -192,7 +192,7 @@ ${OpenCV_LIBS}
 ${DC_LIBS}
 ${VIMBA_LIBS})
 
-target_link_libraries(turnoff LINK_PUBLIC 
+target_link_libraries(turn LINK_PUBLIC 
 ${Boost_LIBRARIES} 
 ${Boost_FILESYSTEM_LIBRARY}
 ${Boost_SYSTEM_LIBRARY}
