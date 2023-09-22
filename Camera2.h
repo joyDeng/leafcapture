@@ -26,38 +26,23 @@ using namespace cv;
 using namespace AVT;
 using namespace VmbAPI;
 
-class FrameObserver : public IFrameObserver {
-    public:
-    FrameObserver(CameraPtr pCamera) : IFrameObserver(pCamera){};
+// class FrameObserver : public IFrameObserver {
+//     public:
+//     FrameObserver(CameraPtr pCamera) : IFrameObserver(pCamera){};
 
-    void FrameReceived(const FramePtr pFrame)
-    {
-        m_pCamera->QueueFrame(pFrame);
-    }
-};
+//     void FrameReceived(const FramePtr pFrame)
+//     {
+//         SP_ACCESS( pCamera )->QueueFrame(pFrame);
+//     }
+// };
 
 
 class Camera2 : public CaptureDevice {
-    // VmbErrorType PrintGetValueErrorMessage ( const VmbErrorType err )
-    // {
-    //     if ( VmbErrorSuccess != err )
-    //     {
-    //         std::cout << "Could not get feature value. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "\n";
-    //     }
 
-    //     return err;
-    // }
-
-        //
-    // Prints out the value and the type of a given feature
-    //
-    // Parameters:
-    //  [in]    feature         The feature to work on
-    //
     void static PrintFeatureValue( const FeaturePtr &feature )
     {
         VmbFeatureDataType  eType;
-        VmbErrorType        err     = feature->GetDataType( eType );
+        VmbErrorType        err     = SP_ACCESS( feature )->GetDataType( eType );
         if( VmbErrorSuccess != err )
         {
             std::cout << "[Could not get feature Data Type. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]\n";
@@ -70,7 +55,7 @@ class Camera2 : public CaptureDevice {
                 case VmbFeatureDataBool:
                     {
                         VmbBool_t bValue;
-                        err = feature->GetValue( bValue );
+                        err = SP_ACCESS( feature )->GetValue( bValue );
                         // if ( VmbErrorSuccess == PrintGetValueErrorMessage( err ) )
                         {
                             std::cout << bValue << "\n";
@@ -81,7 +66,7 @@ class Camera2 : public CaptureDevice {
                 case VmbFeatureDataEnum:
                     {
                         std::string strValue;
-                        err = feature->GetValue( strValue );
+                        err = SP_ACCESS( feature )->GetValue( strValue );
                         // if ( VmbErrorSuccess == PrintGetValueErrorMessage( err ) )
                         {
                             std::cout << strValue << "\n";
@@ -93,14 +78,14 @@ class Camera2 : public CaptureDevice {
                     {
                         double fValue;
                         double fMin, fMax;
-                        err = feature->GetValue( fValue );
+                        err = SP_ACCESS( feature )->GetValue( fValue );
                         // if( VmbErrorSuccess == PrintGetValueErrorMessage( err ) )
                         {
                             std::cout << fValue << "\n";
                         }
 
                         std::cout << "/// Minimum        : ";
-                        err = feature->GetRange( fMin, fMax );
+                        err = SP_ACCESS( feature )->GetRange( fMin, fMax );
                         // if( VmbErrorSuccess == PrintGetValueErrorMessage( err ) )
                         {
                             std::cout << fMin << "\n";
@@ -113,14 +98,14 @@ class Camera2 : public CaptureDevice {
                     {
                         VmbInt64_t nValue;
                         VmbInt64_t nMin, nMax;
-                        err = feature->GetValue( nValue );
+                        err = SP_ACCESS( feature )->GetValue( nValue );
                         // if( VmbErrorSuccess == PrintGetValueErrorMessage( err ) )
                         {
                             std::cout << nValue << "\n";
                         }
 
                         std::cout << "/// Minimum        : ";
-                        err = feature->GetRange( nMin, nMax );
+                        err = SP_ACCESS( feature )->GetRange( nMin, nMax );
                         // if( VmbErrorSuccess == PrintGetValueErrorMessage( err ) )
                         {
                             std::cout << nMin << "\n";
@@ -133,7 +118,7 @@ class Camera2 : public CaptureDevice {
                     {
                         std::string strValue;
                         
-                        err = feature->GetValue( strValue );
+                        err = SP_ACCESS( feature )->GetValue( strValue );
                         // if( VmbErrorSuccess == PrintGetValueErrorMessage( err ) )
                         {
                             std::cout << strValue << "\n";
@@ -172,49 +157,49 @@ class Camera2 : public CaptureDevice {
 
         std::ostringstream ErrorStream;
 
-        VmbErrorType err = feature->GetName( strName );
+        VmbErrorType err = SP_ACCESS( feature )->GetName( strName );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get feature Name. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]";
             strName = ErrorStream.str();
         }
 
-        err = feature->GetDisplayName( strDisplayName );
+        err = SP_ACCESS( feature )->GetDisplayName( strDisplayName );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get feature Display Name. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]";
             strDisplayName = ErrorStream.str();
         }
 
-        err = feature->GetToolTip( strToolTip );
+        err = SP_ACCESS( feature )->GetToolTip( strToolTip );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get feature Tooltip. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]";
             strToolTip = ErrorStream.str();
         }
 
-        err = feature->GetDescription( strDescription );
+        err = SP_ACCESS( feature )->GetDescription( strDescription );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get feature Description. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]";
             strDescription = ErrorStream.str();
         }
 
-        err = feature->GetCategory( strCategory );
+        err = SP_ACCESS( feature )->GetCategory( strCategory );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get feature Category. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]";
             strCategory = ErrorStream.str();
         }
 
-        err = feature->GetSFNCNamespace( strSFNCNamespace );
+        err = SP_ACCESS( feature )->GetSFNCNamespace( strSFNCNamespace );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get feature SNFC Namespace. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]";
             strSFNCNamespace = ErrorStream.str();
         }
 
-        err = feature->GetUnit( strUnit );
+        err = SP_ACCESS( feature )->GetUnit( strUnit );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get feature Unit. Error code: " << err << " (" << AVT::VmbAPI::Examples::ErrorCodeToMessage( err ) << ")" << "]";
@@ -241,35 +226,35 @@ class Camera2 : public CaptureDevice {
 
         std::ostringstream ErrorStream;
 
-        VmbErrorType err = camera->GetID( strID );
+        VmbErrorType err = SP_ACCESS( camera )->GetID( strID );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get camera ID. Error code: " << err << "("<<AVT::VmbAPI::Examples::ErrorCodeToMessage(err)<<")"<< "]";
             strID =  ErrorStream.str();
         }
                     
-        err = camera->GetName( strName );
+        err = SP_ACCESS( camera )->GetName( strName );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get camera name. Error code: " << err << "("<<AVT::VmbAPI::Examples::ErrorCodeToMessage(err)<<")"<< "]";
             strName = ErrorStream.str() ;
         }
 
-        err = camera->GetModel( strModelName );
+        err = SP_ACCESS( camera )->GetModel( strModelName );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get camera mode name. Error code: " << err << "("<<AVT::VmbAPI::Examples::ErrorCodeToMessage(err)<<")"<< "]";
             strModelName = ErrorStream.str();
         }
 
-        err = camera->GetSerialNumber( strSerialNumber );
+        err = SP_ACCESS( camera )->GetSerialNumber( strSerialNumber );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get camera serial number. Error code: " << err << "("<<AVT::VmbAPI::Examples::ErrorCodeToMessage(err)<<")"<< "]";
             strSerialNumber = ErrorStream.str();
         }
 
-        err = camera->GetInterfaceID( strInterfaceID );
+        err = SP_ACCESS( camera )->GetInterfaceID( strInterfaceID );
         if( VmbErrorSuccess != err )
         {
             ErrorStream << "[Could not get interface ID. Error code: " << err << "("<<AVT::VmbAPI::Examples::ErrorCodeToMessage(err)<<")"<< "]";
@@ -299,31 +284,51 @@ class Camera2 : public CaptureDevice {
         m_sys_err = m_sys.Startup();                                // Initialize the Vimba API
 
 
-        std::stringstream strError;
+        // std::stringstream strError;
         if( VmbErrorSuccess == m_sys_err )
         {   
             syson = true;
             m_cam_err = m_sys.GetCameras( m_cameras );            // Fetch all cameras known to Vimba
             if( VmbErrorSuccess == m_cam_err )
             {
-                std::cout << "Cameras found: " << m_cameras.size() <<"\n\n";
+                std::cout << "FOUND: " << m_cameras.size() <<" CAMERAS \n\n";
                 camera_number = m_cameras.size();
-
                 std::for_each( m_cameras.begin(), m_cameras.end(), PrintCameraInfo );
-
-                m_frames = new FramePtrVector(1);
+                
+                // m_frames = FramePtrVector()
+                m_frames.resize(3);
                 
                 for (int i = 0 ; i < m_cameras.size() ; i++){
-                    CameraPtr           pCamera     = CameraPtr();                          // Our camera
-                    // FeaturePtrVector    features; 
-                    pCamera = m_cameras[i];
-                    pCamera->Open(VmbAccessModeFull);
-                    setPixelFormat(pCamera);
-                    AdjustBandLimit(pCamera);
-                    enableFrameRate(pCamera);
+                    m_cam_err = SP_ACCESS(  m_cameras[i] )->Open(VmbAccessModeFull);
+                    if (VmbErrorSuccess != m_cam_err){
+                        errorLog(m_cam_err, "Could not open camera [error code:" );
+                        SP_ACCESS(  m_cameras[i] )->Close();
+                        exit(0);
+                    }
+
+                    // FeaturePtr pCommandFeature;
+                    // if ( VmbErrorSuccess ==  m_cameras[i]->GetFeatureByName( "GVSPAdjustPacketSize", pCommandFeature ))
+                    // {
+                    //     if ( VmbErrorSuccess == pCommandSP_ACCESS( Feature )->RunCommand() )
+                    //     {
+                    //         bool bIsCommandDone = false;
+                    //         do
+                    //         {
+                    //             if ( VmbErrorSuccess != pCommandSP_ACCESS( Feature )->IsCommandDone( bIsCommandDone ))
+                    //             {
+                    //                 break;
+                    //             }
+                    //         } while ( false == bIsCommandDone );
+                    //     }
+                    // }
+
+                    setPixelFormat(m_cameras[i]);
+                    AdjustBandLimit(m_cameras[i]);
+                    enableFrameRate(m_cameras[i]);
                     
-                    pCamera->Close();
+                    SP_ACCESS( m_cameras[i] )->Close();
                 }
+
                 std::cout<<"camera created"<<std::endl;
                 frameallocated = true;
                 created = true;
@@ -333,7 +338,6 @@ class Camera2 : public CaptureDevice {
                 std::cout << "Could not list cameras. Error code: " << m_cam_err << "("<<AVT::VmbAPI::Examples::ErrorCodeToMessage(m_cam_err)<<")"<< "\n";
             }
 
-            // m_sys.Shutdown();                             // Close Vimba
         }
         else
         {
@@ -343,32 +347,15 @@ class Camera2 : public CaptureDevice {
         
     }
 
-    void checkFeature(CameraPtr cptr){
-        FeaturePtr feature;
-        double expTime;
-        cptr->GetFeatureByName("ExposureTime", feature);
-        feature->GetValue(expTime);
-        std::cout<<" exp time: "<<expTime<<"us"<<std::endl;
-    }
-
-    void checkPixelFormat(CameraPtr cptr){
-        FeaturePtr feature;
-        std::string strValue;
-
-        cptr->GetFeatureByName("PixelFormat", feature);
-        feature->GetValue(strValue);
-        std::cout<<strValue<<std::endl;
-    }
-
     void setPixelFormat(CameraPtr cptr){
         FeaturePtr feature;
-        cptr->GetFeatureByName("PixelFormat", feature);
+        SP_ACCESS( cptr )->GetFeatureByName("PixelFormat", feature);
         std::string strValue;
-        feature->GetValue(strValue);
+        SP_ACCESS( feature )->GetValue(strValue);
         // std::cout<<"set pixel format to: "<<strValue<<"us"<<std::endl;
         if(std::strcmp(strValue.c_str(), m_frame_format.c_str()) == 0) return;
         else{
-        VmbErrorType err = feature->SetValue(m_frame_format.c_str());
+        VmbErrorType err = SP_ACCESS( feature )->SetValue(m_frame_format.c_str());
             if (VmbErrorSuccess != err){
                 std::cout<<"failed to set pixel format"<<std::endl;
                 if(VmbErrorApiNotStarted == err)
@@ -386,61 +373,64 @@ class Camera2 : public CaptureDevice {
 
             }
             std::string strValue;
-            feature->GetValue(strValue);
+            SP_ACCESS( feature )->GetValue(strValue);
             std::cout<<"set pixel format to: "<<strValue<<"us"<<std::endl;
         }
     }
 
     void enableFrameRate(CameraPtr cptr){
         FeaturePtr feature;
-        cptr->GetFeatureByName("AcquisitionFrameRateEnable", feature);
-        feature->SetValue(false);
+        SP_ACCESS( cptr )->GetFeatureByName("AcquisitionFrameRateEnable", feature);
+        SP_ACCESS( feature )->SetValue(false);
         bool enabled;
-        feature->GetValue(enabled);
+        SP_ACCESS( feature )->GetValue(enabled);
         std::cout<<"AcquisitionFrameRateEnable: "<<enabled<<std::endl;
     }
 
     void AdjustFrameRate(CameraPtr cptr){
 
         FeaturePtr expfeature;
-        cptr->GetFeatureByName("ExposureTime", expfeature);
+        SP_ACCESS( cptr )->GetFeatureByName("ExposureTime", expfeature);
         double exp;
-        expfeature->GetValue(exp);
+        SP_ACCESS( expfeature )->GetValue(exp);
 
         double frame_per_sec = 1000000 / exp - 2;
 
         FeaturePtr feature;
-        cptr->GetFeatureByName("AcquisitionFrameRate", feature);
+        SP_ACCESS( cptr )->GetFeatureByName("AcquisitionFrameRate", feature);
         double max_rate, min_rate;
-        feature->GetRange( min_rate, max_rate );
+        SP_ACCESS( feature )->GetRange( min_rate, max_rate );
 
         frame_per_sec = min(max_rate, frame_per_sec);
-        VmbErrorType err = feature->SetValue(frame_per_sec);
+        VmbErrorType err = SP_ACCESS( feature )->SetValue(frame_per_sec);
         double frame_rate;
-        feature->GetValue(frame_rate);
+        SP_ACCESS( feature )->GetValue(frame_rate);
         std::cout<<"frame_per_sec:"<<frame_per_sec<<"AcquisitionFrameRate: "<<frame_rate<<std::endl;
     }
 
     void AdjustBandLimit(CameraPtr cptr){
         FeaturePtr bandlimit;
-        cptr->GetFeatureByName("DeviceLinkThroughputLimit", bandlimit);
-        // double exp;
-        // expfeature->GetValue(exp);
+        SP_ACCESS( cptr )->GetFeatureByName("DeviceLinkThroughputLimit", bandlimit);
+
         long long int max_band, min_band;
         bandlimit->GetRange( min_band, max_band );
-        long long int seto = (min_band);
+        long long int seto = (2 * min_band);
         bandlimit->SetValue(seto);
         long long int after_set;
         bandlimit->GetValue(after_set);
-        std::cout<<"band:"<<min_band<<"band: "<<after_set<<std::endl;
+        std::cout<<"band: "<<min_band<<"band: "<<after_set<<std::endl;
     }
 
     void setExpTime(CameraPtr cptr, double expTime){
         FeaturePtr feature;
-        cptr->GetFeatureByName("ExposureTime", feature);
-        feature->SetValue(expTime);
+        SP_ACCESS( cptr )->GetFeatureByName("ExposureTime", feature );
+        double min_exp, max_exp;
+        SP_ACCESS( feature )->GetRange( min_exp, max_exp );
+        std::cout<<"supprt exp: "<<min_exp<<" max: "<<max_exp<<std::endl;
+
+        SP_ACCESS( feature )->SetValue(expTime);
         double setExpTime;
-        feature->GetValue(setExpTime);
+        SP_ACCESS( feature )->GetValue(setExpTime);
         std::cout<<"set exp time to: "<<setExpTime<<"us"<<std::endl;
     }
 
@@ -472,10 +462,6 @@ class Camera2 : public CaptureDevice {
             }
 
             imwrite(prefix+".bmp", img);
-
-            // Mat scaled_img = img / float(number);?
-            
-            // imwrite(prefix+"_black.hdr", scaled_img);
             return true;
     }
 
@@ -485,21 +471,21 @@ class Camera2 : public CaptureDevice {
         }
     }
 
-     bool findSaturated(std::string prefix, double max_exp, double min_exp, double step, int camera_id=0){
+    bool findSaturated(std::string prefix, double max_exp, double min_exp, double step, int camera_id=0){
 
-            bool over_exp = true;
-            float exp = max_exp;
+        bool over_exp = true;
+        float exp = max_exp;
 
-            
-            while (exp > min_exp){
-                shot(exp, camera_id);
-                std::string name = prefix + "_exp_" + std::to_string(exp)+".hdr";
-                // over_exp = accumulate_valid_buffer(image_final, time_final, exp);
-                readbuffer(name);
-                exp -= step;
-            }
+        
+        while (exp > min_exp){
+            shot(exp, camera_id);
+            std::string name = prefix + "_exp_" + std::to_string(exp)+".hdr";
+            // over_exp = accumulate_valid_buffer(image_final, time_final, exp);
+            readbuffer(name);
+            exp -= step;
+        }
 
-            return true;
+        return true;
     }
 
 
@@ -534,40 +520,43 @@ class Camera2 : public CaptureDevice {
     }
 
     bool shot(double exp=40000, int id=0){
-        std::cout<<"start taking photo of camera"<<id<<std::endl;
+        std::cout<<"start taking photo of camera"<<id<<" / "<<camera_number<<std::endl;
         CameraPtr camera_ptr = m_cameras[id];
-        VmbErrorType err = camera_ptr->Open( VmbAccessModeFull );
+        VmbErrorType err = SP_ACCESS(camera_ptr)->Open( VmbAccessModeFull );
         if ( VmbErrorSuccess != err )
         {
             errorLog(err, "Could not get camera id [error code:" );
-            err = camera_ptr->Close();
+            err = SP_ACCESS(camera_ptr)->Close();
             errorLog(err, "Could not close camera [error code: " );
             return false;
         }
 
         AdjustBandLimit(camera_ptr);
         setExpTime(camera_ptr, exp);
-        // AdjustFrameRate(camera_ptr);
-
-        VmbInt32_t timeoutvalue = 500;
-        err = camera_ptr->AcquireSingleImage((*m_frames)[0], timeoutvalue);
-
-        int count = 0;
-        while( VmbErrorSuccess != err && count < 10 ){
-            printf("%d", err);
-            err = camera_ptr->AcquireSingleImage((*m_frames)[0],timeoutvalue);
-            count += 1;
+        
+        if (m_frames[0] != nullptr){
+            VmbFrameStatusType eReceiveStatus;
+            err = m_frames[0]->GetReceiveStatus( eReceiveStatus );
+            std::cout<<" recieve status: "<<eReceiveStatus<<std::endl;
         }
+
+        VmbInt32_t timeoutvalue = ( m_frames.size() + 1) * exp / 1000;
+        VmbUint32_t image_count = 0;
+        err = SP_ACCESS(camera_ptr)->AcquireMultipleImages(m_frames, timeoutvalue, image_count, FrameAllocation_AnnounceFrame);
+        
         if ( VmbErrorSuccess != err ){
-            errorLog(err, "timeout! can not capture image " );
+            std::cout<<" number of image captured "<<image_count<<std::endl;
+            errorLog(err, " [ERROR] timeout! can not capture image " );
         }
 
-        camera_ptr->Close();
-        return true;
+        SP_ACCESS(camera_ptr)->Close();
+        if( image_count > 0)
+            return true;
+        else return false;
     }
 
     void getImageSize(){
-        FramePtr fptr = (*m_frames)[0];
+        FramePtr fptr = m_frames[0];
         fptr->GetWidth(m_width);
         fptr->GetHeight(m_height);
         fptr->GetImageSize(m_image_buffer_size);
@@ -575,32 +564,18 @@ class Camera2 : public CaptureDevice {
     }
 
     void * getImage(int id){
-        FramePtr fptr = (*m_frames)[0];
+        FramePtr fptr = m_frames[0];
         VmbUchar_t* buffer_ptr;
         fptr->GetImage(buffer_ptr);
         return buffer_ptr;
     }
 
     int flush(std::string filename, int id=0){
-        // FramePtr fptr = (*m_frames)[0];
-
-        // VmbFrameStatusType eReceiveStatus;
-        // VmbErrorType err = fptr->GetReceiveStatus( eReceiveStatus );
-
-        // printf(" vmberrorSucess %d, vmbgramestatuscomplete %d", VmbErrorSuccess == err, VmbFrameStatusComplete == eReceiveStatus);
-        
-        // VmbUchar_t* pBuffer;
-        // fptr->GetImage(pBuffer);
-        
-        // VmbUint32_t width, height;
-        // fptr->GetWidth(width);
-        // fptr->GetHeight(height);
-
         return readbuffer(filename);
     }
 
     bool readbuffer(std::string filename){
-        FramePtr fptr = (*m_frames)[0];
+        FramePtr fptr = m_frames[0];
 
         VmbFrameStatusType eReceiveStatus;
         VmbErrorType err = fptr->GetReceiveStatus( eReceiveStatus );
@@ -671,7 +646,7 @@ class Camera2 : public CaptureDevice {
     }
 
     void getbuffer(float *dtr){
-        FramePtr fptr = (*m_frames)[0];
+        FramePtr fptr = m_frames[0];
 
         VmbFrameStatusType eReceiveStatus;
         VmbErrorType err = fptr->GetReceiveStatus( eReceiveStatus );
@@ -728,7 +703,7 @@ class Camera2 : public CaptureDevice {
 
 
     bool accumulate_valid_buffer(float *image_acc, float *exp_total, float exp){
-        FramePtr fptr = (*m_frames)[0];
+        FramePtr fptr = m_frames[0];
 
         VmbFrameStatusType eReceiveStatus;
         VmbErrorType err = fptr->GetReceiveStatus( eReceiveStatus );
@@ -795,22 +770,22 @@ class Camera2 : public CaptureDevice {
     }
 
     ~Camera2(){
+        // if (frameallocated){
+        //     free(m_frames);
+        //     frameallocated = false;
+        // }
+
         if (syson){
             VmbErrorType err = m_sys.Shutdown();
             errorLog(err, "Could not shutdown Vimba [error code: " );
             syson = false;
         }
-
-        if (frameallocated){
-            free(m_frames);
-            frameallocated = false;
-        }
     }
 
     VmbErrorType m_sys_err;
     VmbErrorType m_cam_err;
-    VmbInt64_t nPLS;
-    FramePtrVector * m_frames;
+
+    FramePtrVector m_frames;
     bool syson = false;
     bool frameallocated = false;
     bool created = false;

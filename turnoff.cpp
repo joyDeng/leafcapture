@@ -3,15 +3,17 @@
 #include "Serial.h"
 
 #include <boost/filesystem.hpp>
-// #include ""
-
 using namespace std;
+#define NUM_LIGHT 11
 
-// void photomode1(Camera *camera){
-//     // ;
-//     // printf("sleep\n");
-    
-// }
+bool testalllight(Serial &myport, int num_light){
+    for(int i = 0 ; i < num_light ;i++){
+        myport.turnOn(i);
+        sleep(1);
+        myport.turnOff(i);
+    }
+    return true;
+}
 
 int main(int argc, char **argv){
 
@@ -27,9 +29,18 @@ int main(int argc, char **argv){
     Serial arduino("/dev/ttyACM0");
     char ret;
     arduino.readChar(&ret);
+    printf("turn id = %d, %c, %s", id, ret, cm);
     if(ret=='R');
-    if(cm=="o") arduino.turnOn(id);
-    else arduino.turnOff(id);
 
+    if(cm=="o") {
+        printf("turn id = %d, %c, on \n", id, ret, cm);
+        arduino.turnOn(id);
+    }else if(cm == "f"){
+        printf("turn id = %d, %c, off \n", id, ret, cm);
+        arduino.turnOff(id);
+    }else{
+        for(int i = 0 ; i < NUM_LIGHT ; i++)
+            arduino.turnOff(i);
+    }
     return 0;
 }

@@ -2,7 +2,7 @@
 // #include <glad/gl.h>
 #pragma once
 #include <GLFW/glfw3.h>
-#include "Camera2.h"
+#include "AllivedCameras.h"
 
 #include <chrono>
 #include <thread>
@@ -14,7 +14,7 @@ using namespace std::chrono;
 class ImageWindow{
     public:
     GLFWwindow* window;
-    Camera2 *m_camera;
+    CameraC *m_camera;
     GLuint tex_handle;
     unsigned int width = 640;
     unsigned int height = 480;
@@ -26,7 +26,7 @@ class ImageWindow{
         if (!glfwInit())
           exit(0);
        
-        m_camera = new Camera2();
+        m_camera = new CameraC();
         if(m_camera->created){
             // m_camera->setupCapture(50);
             auto start = high_resolution_clock::now();

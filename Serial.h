@@ -11,12 +11,12 @@
 using namespace std;
 using namespace boost::asio;
 
-#define numLight 7
+#define numLight 11
 
 class Serial{
     bool connected=false;
     int id;
-    char lightids[7] = {'0', '1', '2', '4', '5', '6', '7'};
+    // char lightids[7] = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'};
     // io_service m_io;
     string port_name;
     serial_port *m_port;
@@ -33,6 +33,7 @@ class Serial{
             std::cout<<" the port is not open "<<std::endl;
             connected = false;
         }
+        std::cout<<" serial initialized "<<std::endl;
     };
 
     ~Serial(){
@@ -47,40 +48,45 @@ class Serial{
     }
 
     void sendChar(char *a) {
-        printf("sending cmd %c", *a);
-        // const_buffer buf(&a, 1);
-        // buf(&count, 4);
-        write(*m_port, buffer(a, 2));
+        printf(" sending cmd %c \n", *a);
+        write(*m_port, buffer(a, 3));
     }
 
     void readChar(char *a) {
-        // for (int i=0; i<2; i++){
-            // char c;
         read(*m_port, buffer(a, 1));
-            // ret += c;
-        // }
     }
 
     void turnOn(int id){
-        char cmd[2] = {lightids[id % numLight], 'O'};
-        sendChar(cmd);
-        char ret;
-        readChar(&ret);
-        if (ret == 'D')
-            printf("light %d turned ON \n" , id);
-        else
-            printf("light %d not turned on \n", id);
+        int decimal = id / 10;
+        int digital = id % 10;
+        char cmd[3] = {(char)(decimal + '0'), (char)(digital + '0'), 'O'};
+        bool turned_on = false;
+        while(!turned_on){
+            sendChar(cmd);
+            char ret;
+            readChar(&ret);
+            if(ret == 'D') turned_on = true;
+        }
+        assert(turned_on==true);
     }
 
     void turnOff(int id){
-        char cmd[2] = {lightids[id % numLight], 'F'};
-        sendChar(cmd);
-        char ret;
-        readChar(&ret);
-        if (ret == 'D')
-            printf("light %d turned Off \n" , id);
-        else
-            printf("light %d not turned off \n", id);
+        int decimal = id / 10;
+        int digital = id % 10;
+        char cmd[3] = {(char)(decimal + '0'), (char)(digital + '0'), 'F'};
+        bool turned_off = false;        
+        while(!turned_off){
+            sendChar(cmd);
+            char ret;
+            readChar(&ret);
+            if(ret == 'D') turned_off = true;
+        }
+
+        assert(turned_off==true);
+        // if (ret == 'D')
+        //     printf("light %d turned Off \n" , id);
+        // else
+        //     printf("light %d not turned off \n", id);
     }
 
     bool isConnected(){return connected;}

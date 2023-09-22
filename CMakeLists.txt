@@ -43,35 +43,36 @@ add_subdirectory("ext/glfw")
 #     message("apple only")
 # endif()
 
-add_executable(capture 
-Camera.h
-Capture.h
-Camera2.h
-Camera.cpp
-Serial.h
-Serial.cpp
-Window.h
-main.cpp)
+# add_executable(capture 
+# Camera.h
+# Capture.h
+# # Camera2.h
+# AllivedCameras.h
+# Camera.cpp
+# Serial.h
+# Serial.cpp
+# Window.h
+# main.cpp)
 
 add_executable(saturate 
 Camera.h
 Capture.h
-Camera2.h
 Camera.cpp
 Serial.h
 Serial.cpp
-Window.h
+# Window.h
+AllivedCameras.h
 test_exp.cpp)
 
-add_executable(calibrate 
-Camera.h
-Capture.h
-Camera2.h
-Camera.cpp
-Serial.h
-Serial.cpp
-Window.h
-calibrate.cpp)
+# add_executable(calibrate 
+# Camera.h
+# Capture.h
+# Camera2.h
+# Camera.cpp
+# Serial.h
+# Serial.cpp
+# Window.h
+# calibrate.cpp)
 
 add_executable(turn 
 Camera.h
@@ -96,10 +97,10 @@ get_filename_component( VIMBA_MES_INC_DIR "${Vimba_DIR}/VimbaCPP/Examples" ABSOL
 FIND_LIBRARY(LIBUSB_INLCUDE_DIR NAMES libusb.h PATH_SUFFIXES "include" "libusb" "libusb-1.0")
 FIND_LIBRARY(LIBUSB_LIBRARY NAMES usb PATH_SUFFIXES "lib" "lib32" "lib64")
 FIND_LIBRARY(LIBDC1394_LIBRARY NAMES libdc1394.so PATHS "/usr/local/lib/")
-FIND_LIBRARY(VIMBACPP_LIB NAMES libVimbaCPP.so PATHS "/opt/Vimba_6_0/VimbaCPP/DynamicLib/x86_64bit/")
-FIND_LIBRARY(VIMBA_TRANS_LIB NAMES libVimbaC.so PATHS "/opt/Vimba_6_0/VimbaCPP/DynamicLib/x86_64bit/")
-FIND_LIBRARY(VIMBAC_LIB NAMES libVimbaImageTransform.so PATHS "/opt/Vimba_6_0/VimbaImageTransform/DynamicLib/x86_64bit/")
-
+FIND_LIBRARY(VIMBACPP_LIB NAMES libVimbaCPP.so PATHS "/opt/Vimba_6_0/VimbaCPP/Build/Make/dynamic/x86_64bit/")
+FIND_LIBRARY(VIMBAC_LIB NAMES libVimbaC.so PATHS "/opt/Vimba_6_0/VimbaCPP/Build/Make/dynamic/x86_64bit/")
+FIND_LIBRARY(VIMBA_TRANS_LIB NAMES libVimbaImageTransform.so PATHS "/opt/Vimba_6_0/VimbaImageTransform/DynamicLib/x86_64bit/")
+# VIMBAC_LIB
 list( APPEND VIMBA_LIBS ${VIMBACPP_LIB} )
 list( APPEND VIMBA_LIBS ${VIMBA_TRANS_LIB} )
 list( APPEND VIMBA_LIBS ${VIMBAC_LIB} )
@@ -107,12 +108,12 @@ list( APPEND DC_LIBS ${LIBDC1394_LIBRARY})
 
 message("VIMBA_LIBS = ${VIMBA_LIBS}")
 
-target_include_directories(capture 
-PUBLIC ${VIMBA_INC_DIR}
-PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
-PUBLIC ${VIMBA_MES_INC_DIR}
-PUBLIC ${STB_INCLUDE} 
-PUBLIC ${OpenCV_INCLUDE_DIRS})
+# target_include_directories(capture 
+# PUBLIC ${VIMBA_INC_DIR}
+# PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
+# PUBLIC ${VIMBA_MES_INC_DIR}
+# PUBLIC ${STB_INCLUDE} 
+# PUBLIC ${OpenCV_INCLUDE_DIRS})
 
 target_include_directories(turn
 PUBLIC ${VIMBA_INC_DIR}
@@ -128,31 +129,31 @@ PUBLIC ${VIMBA_MES_INC_DIR}
 PUBLIC ${STB_INCLUDE} 
 PUBLIC ${OpenCV_INCLUDE_DIRS})
 
-target_include_directories(calibrate 
-PUBLIC ${VIMBA_INC_DIR}
-PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
-PUBLIC ${VIMBA_MES_INC_DIR}
-PUBLIC ${STB_INCLUDE} 
-PUBLIC ${OpenCV_INCLUDE_DIRS})
+# target_include_directories(calibrate 
+# PUBLIC ${VIMBA_INC_DIR}
+# PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
+# PUBLIC ${VIMBA_MES_INC_DIR}
+# PUBLIC ${STB_INCLUDE} 
+# PUBLIC ${OpenCV_INCLUDE_DIRS})
 
 
 # -lboost_filesystem -lboost_system
 
-target_link_libraries(capture LINK_PUBLIC 
-${Boost_LIBRARIES} 
-${Boost_FILESYSTEM_LIBRARY}
-${Boost_SYSTEM_LIBRARY}
-# ${DC1394} 
-# ${libusb}
-usb-1.0
-# dc1394
-glfw
-# STB_IMAGE
-OpenGL
-${OpenCV_LIBS}
-# ${LIBVIMBA}
-${DC_LIBS}
-${VIMBA_LIBS})
+# target_link_libraries(capture LINK_PUBLIC 
+# ${Boost_LIBRARIES} 
+# ${Boost_FILESYSTEM_LIBRARY}
+# ${Boost_SYSTEM_LIBRARY}
+# # ${DC1394} 
+# # ${libusb}
+# usb-1.0
+# # dc1394
+# glfw
+# # STB_IMAGE
+# OpenGL
+# ${OpenCV_LIBS}
+# # ${LIBVIMBA}
+# ${DC_LIBS}
+# ${VIMBA_LIBS})
 
 target_link_libraries(turn LINK_PUBLIC 
 ${Boost_LIBRARIES} 
@@ -181,16 +182,16 @@ ${OpenCV_LIBS}
 ${DC_LIBS}
 ${VIMBA_LIBS})
 
-target_link_libraries(calibrate LINK_PUBLIC 
-${Boost_LIBRARIES} 
-${Boost_FILESYSTEM_LIBRARY}
-${Boost_SYSTEM_LIBRARY}
-usb-1.0
-glfw
-OpenGL
-${OpenCV_LIBS}
-${DC_LIBS}
-${VIMBA_LIBS})
+# target_link_libraries(calibrate LINK_PUBLIC 
+# ${Boost_LIBRARIES} 
+# ${Boost_FILESYSTEM_LIBRARY}
+# ${Boost_SYSTEM_LIBRARY}
+# usb-1.0
+# glfw
+# OpenGL
+# ${OpenCV_LIBS}
+# ${DC_LIBS}
+# ${VIMBA_LIBS})
 
 target_link_libraries(turn LINK_PUBLIC 
 ${Boost_LIBRARIES} 

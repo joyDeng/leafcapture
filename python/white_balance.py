@@ -39,61 +39,61 @@ if not os.path.exists(wb_dir):
 
 # print(rs)
 # print(bs)
-# range_dict = {
-#     '0': [[1065, 1058, 1139, 1184], [1190, 1045, 1259, 1161], [1302, 1027, 1366, 1141], [1408, 1012, 1468, 1122], [1508, 996, 1561, 1105], [1605, 981, 1652, 1084]],
-#     '1': [[506, 1151, 596, 1279], [674, 1172, 771, 1308], [849, 1198, 949, 1336], [1024, 1225, 1122, 1359], [1198, 1253, 1299, 1387], [1375, 1276, 1470, 1402]],
-#     '2': [[2042, 502, 2182, 661], [1788, 466, 1876, 603], [1532, 430, 1638, 562], [1281, 396, 1413, 533], [1057, 374, 1185, 493], [800, 356, 925, 456]]
-# }
+range_dict = {
+    '0': [[1065, 1058, 1139, 1184], [1190, 1045, 1259, 1161], [1302, 1027, 1366, 1141], [1408, 1012, 1468, 1122], [1508, 996, 1561, 1105], [1605, 981, 1652, 1084]],
+    '1': [[506, 1151, 596, 1279], [674, 1172, 771, 1308], [849, 1198, 949, 1336], [1024, 1225, 1122, 1359], [1198, 1253, 1299, 1387], [1375, 1276, 1470, 1402]],
+    '2': [[2042, 502, 2182, 661], [1788, 466, 1876, 603], [1532, 430, 1638, 562], [1281, 396, 1413, 533], [1057, 374, 1185, 493], [800, 356, 925, 456]]
+}
 
-# light_dict = {
-#     '0': [1, 4, 5],
-#     '1': [1, 3, 4, 5, 6],
-#     '2': [0, 2]
-# }
+light_dict = {
+    '0': [1, 4, 5],
+    '1': [1, 3, 4, 5, 6],
+    '2': [0, 2]
+}
 
-# up_down = {
-#     '0': "up",
-#     '1': "up",
-#     '2': "down"
-# }
+up_down = {
+    '0': "up",
+    '1': "up",
+    '2': "down"
+}
 
-# colors = np.array([[243, 243, 242], [200, 200, 200], [160, 160, 160], [122, 122, 121], [85, 85, 85], [52, 52, 52]], dtype=np.float)
-# ref_colors_regularized = colors / colors[:, 1].reshape(-1, 1)
+colors = np.array([[243, 243, 242], [200, 200, 200], [160, 160, 160], [122, 122, 121], [85, 85, 85], [52, 52, 52]], dtype=np.float)
+ref_colors_regularized = colors / colors[:, 1].reshape(-1, 1)
 # # print(colors_regularized)
 # # exit(0)
 
-# light_dict_correction = {}
+light_dict_correction = {}
 
-# def white_balance_status(camera_id):
-#     for l in light_dict[camera_id]:
-#         image_name = "{}/color_cali_{}/c{}_l{}_hdrDebevec.hdr".format(DATA_ROOT, up_down[camera_id], camera_id, l)
-#         # print(image_name)
-#         image = cv2.imread(image_name, cv2.IMREAD_UNCHANGED)
-#         colors_regularized = []
-#         for i in range(6):
-#             color_box = range_dict[camera_id][i]
-#             b_color = image[ color_box[1] : color_box[3], color_box[0] : color_box[2]:]
-#             b_sum_0 = np.sum(b_color, axis=0)
-#             b_sum = np.sum(b_sum_0, axis=0)
-#             # print(b_sum)
-#             b_regular = b_sum / b_sum[1].reshape(-1, 1)
-#             colors_regularized.append(b_regular)
-#             # check 
-#             # cv2.imwrite("{}/color_cali_{}/c{}_l{}_b{}.hdr".format(DATA_ROOT, up_down[camera_id], camera_id, l, i), b_color)
-#         # print()
-#         colors_regularized = np.array(colors_regularized).reshape(-1, 3)
-#         # exit(0)
-#         RA = np.vstack([np.array(colors_regularized)[:, 0], np.zeros(6)]).T
-#         Rm, Rc = np.linalg.lstsq(RA, ref_colors_regularized[:, 0], rcond=None)[0]
+def white_balance_status(camera_id):
+    for l in light_dict[camera_id]:
+        image_name = "{}/color_cali_{}/c{}_l{}_hdrDebevec.hdr".format(DATA_ROOT, up_down[camera_id], camera_id, l)
+        # print(image_name)
+        image = cv2.imread(image_name, cv2.IMREAD_UNCHANGED)
+        colors_regularized = []
+        for i in range(6):
+            color_box = range_dict[camera_id][i]
+            b_color = image[ color_box[1] : color_box[3], color_box[0] : color_box[2]:]
+            b_sum_0 = np.sum(b_color, axis=0)
+            b_sum = np.sum(b_sum_0, axis=0)
+            # print(b_sum)
+            b_regular = b_sum / b_sum[1].reshape(-1, 1)
+            colors_regularized.append(b_regular)
+            # check 
+            # cv2.imwrite("{}/color_cali_{}/c{}_l{}_b{}.hdr".format(DATA_ROOT, up_down[camera_id], camera_id, l, i), b_color)
+        # print()
+        colors_regularized = np.array(colors_regularized).reshape(-1, 3)
+        # exit(0)
+        RA = np.vstack([np.array(colors_regularized)[:, 0], np.zeros(6)]).T
+        Rm, Rc = np.linalg.lstsq(RA, ref_colors_regularized[:, 0], rcond=None)[0]
 
-#         BA = np.vstack([np.array(colors_regularized)[:, 2], np.zeros(6)]).T
-#         Bm, Bc = np.linalg.lstsq(BA, ref_colors_regularized[:, 2], rcond=None)[0]
+        BA = np.vstack([np.array(colors_regularized)[:, 2], np.zeros(6)]).T
+        Bm, Bc = np.linalg.lstsq(BA, ref_colors_regularized[:, 2], rcond=None)[0]
 
-#         # print(Rm * np.array(colors_regularized)[:, 0], ref_colors_regularized[:, 0])
-#         # print(Bm * np.array(colors_regularized)[:, 2], ref_colors_regularized[:, 2])
+        # print(Rm * np.array(colors_regularized)[:, 0], ref_colors_regularized[:, 0])
+        # print(Bm * np.array(colors_regularized)[:, 2], ref_colors_regularized[:, 2])
         
 
-#         print("camera_id", camera_id, "light", l, "Blue m", Rm, "Red m", Bm)
+        print("camera_id", camera_id, "light", l, "Blue m", Rm, "Red m", Bm)
         
 
 

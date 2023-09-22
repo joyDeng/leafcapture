@@ -4,12 +4,13 @@
 #include "Window.h"
 #include "Capture.h"
 #include "Camera.h"
-#include "Camera2.h"
+// #include "Camera2.h"
+#include "AllivedCameras.h"
 
 #include <boost/filesystem.hpp>
 
 // #include ""
-
+#define NUM_LIGHT 11
 using namespace std;
 
 // void photomode1(Camera *camera){
@@ -40,9 +41,6 @@ int main(int argc, char **argv){
     std::string data_path = DATA_ROOT + fileprefix;
     boost::filesystem::create_directories(data_path);
 
-
-
-
     Serial arduino("/dev/ttyACM0");
     char ret;
     arduino.readChar(&ret);
@@ -53,19 +51,22 @@ int main(int argc, char **argv){
     window = new ImageWindow();
     window->launchWindow();
     
-    double start_exp = 400000;
+    double start_exp = 10000;
     double scale = 0.5f;
 
     arduino.turnOff(3);
+
+    printf("Has %d cameras", window->m_camera->camera_number);
     
-    for(int i = 0 ; i < 7 ; i++){
-        arduino.turnOn(i);
+    // for(int i = 0 ; i < 2 ; i++){
+    int i = 0;
+        // arduino.turnOn(i);
         for (int cid = window->m_camera->camera_number-1; cid >= 0  ; cid--){
             std::this_thread::sleep_for (std::chrono::seconds(1));
             window->m_camera->shotHDR(data_path+"/c"+std::to_string(cid)+"_l"+std::to_string(i), start_exp, scale, cid);
         }
-        arduino.turnOff(i);
-    }
+        // arduino.turnOff(i);
+    // }
 
     return 0;
 }

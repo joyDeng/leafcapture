@@ -1,5 +1,6 @@
 #pragma once
 
+
 typedef enum CameraType{
     CCHAMELON=0,
     CCANON=1
