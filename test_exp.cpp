@@ -49,8 +49,41 @@ int measure_camera_light(string data_path, int cid, int lid){
     return 1;
 }
 
-int measure_all(string data_path){
+int calibrate_camera_light(string data_path, int cid, int lid, int maxid){
+    
+    Serial arduino("/dev/ttyACM0");
+    char ret;
+    arduino.readChar(&ret);
+    if(ret=='R');
 
+    CameraC *m_camera = new CameraC();
+    float start_exp = 100000;
+    if(m_camera->created){
+        sleep(10);
+        for (int j = 0; j < maxid ; j++){
+            arduino.turnOn(lid);
+            std::cout<<"*****************************************************************"<<std::endl;
+            std::cout<<"************************    START  "<<j<<"  ****************************"<<std::endl;
+            std::cout<<"*****************************************************************"<<std::endl;
+            sleep(1);
+            bool suc = m_camera->shotHDR(data_path + "/c"+std::to_string(cid)+"_l"+std::to_string(lid)+"_j"+std::to_string(j), start_exp, 0.5, cid);
+            if(suc){
+                std::cout<<"caputered: light "<<lid<<" camera_id "<<cid<<std::endl;
+            }else{
+                return 0;
+            }
+            arduino.turnOff(lid);
+            sleep(3);
+        }
+    } else {
+        std::cout<<"failed to create cameras"<<std::endl;
+        return 0;
+    }
+
+    return 1;
+}
+
+int measure_all(string data_path){
     Serial arduino("/dev/ttyACM0");
     char ret;
     arduino.readChar(&ret);
@@ -86,8 +119,12 @@ int main(int argc, char **argv){
         fileprefix = std::string(argv[1]);
     }
 
-    if (argc > 2){
+    if (argc == 2){
         operation = 1;
+    }
+
+    if (argc == 5){
+        operation = -1;
     }
 
     std::string DATA_ROOT = "/home/dx/Research/leaf/data/";
@@ -99,6 +136,11 @@ int main(int argc, char **argv){
         std::cout<<"start to measure light"<<light_id<<" from camera "<<camera_id<<std::endl;
         int suc = measure_camera_light(data_path, camera_id, light_id);
         return suc;
+    }else if(operation == -1){
+        int camera_id = std::stoi(std::string(argv[2]));
+        int light_id = std::stoi(std::string(argv[3]));
+        calibrate_camera_light(data_path, camera_id, light_id, std::stoi(std::string(argv[4])));
+        return true;
     }else{
         int suc = measure_all(data_path);
         return suc;
