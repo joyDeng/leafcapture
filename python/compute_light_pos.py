@@ -23,10 +23,14 @@ light_dict = {
     '10': [50],
 }
 
-plan_dict = {
-    "up" : [37, 47, 57, 36, 46, 56, 35, 45, 55],
-    # "down" : [5, 15, 6, 16, 26, 7, 17, 27]
-}
+# plan_dict = {
+#     "up" : [37, 47, 57, 36, 46, 56, 35, 45, 55],
+#     # "down" : [5, 15, 6, 16, 26, 7, 17, 27]
+# }
+def get_light_id(v):
+    for item in light_dict.items():
+        if item[1][0] == v:
+            return item[0]
 
 def get_points(filename):
     yaml_dict = yaml.safe_load(Path(DATA_DIR+filename).read_text())
@@ -38,9 +42,16 @@ def get_points(filename):
         co = np.array(corner['corners'])
         center = np.mean(co, axis=0)
         cid += 1
-        
+
+        if [int(id)] in light_dict.values():
+            lid = get_light_id(int(id))
+            print(f" light {lid}: ", center * 100)
+            # print(f"corners: {co * 100}")
         all_dict[id] = center
     return all_dict
+
+get_points("/sys_3.yml")
+exit(0)
 
 def get_camera_infos(filename):
     with open(DATA_DIR+filename) as f:
@@ -83,10 +94,10 @@ o1, t1, u1 = camera_up_origin_target(camera_1)
 o2, t2, u2 = camera_up_origin_target(camera_2)
 
 
-all_dict    = get_points("/sys_recon_2.yml")
-c0_dict     = get_points("/C0.yml")
-c1_dict     = get_points("/C1.yml")
-c2_dict     = get_points("/C2.yml")
+# all_dict    = get_points("/sys_recon_2.yml")
+# c0_dict     = get_points("/C0.yml")
+# c1_dict     = get_points("/C1.yml")
+# c2_dict     = get_points("/C2.yml")
 
 
 def FromMatrix(p1, p2, p3, p4, v1, v2, v3, v4):
