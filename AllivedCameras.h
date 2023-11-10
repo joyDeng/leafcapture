@@ -5,6 +5,8 @@
 #include <vector>
 #include <algorithm>
 #include <bitset>
+#include <unistd.h>
+#include <thread>
 
 
 #include "VimbaCPP/Include/VimbaCPP.h"
@@ -129,7 +131,6 @@ void FrameObserver::FrameReceived( const FramePtr pFrame ){
     }
 
     SP_ACCESS( m_pCamera )->QueueFrame( pFrame );
-    // std::cout<<" camera queue frame "<<std::endl;
 }
 
 void FrameObserver::ClearFrameQueue(){
@@ -707,12 +708,12 @@ class CameraC : public CaptureDevice {
             float px = m_images[camera_id].m_Frames[i];
             // std::cout<<"pixel value"<<px<<std::endl;
             // std::cout<<"before"<<std::endl;
-            over_exp |= (px >= 1.0);
+            over_exp |= (px >= 0.975);
             // if (px >= 1.0f) over_exp = true;
             // std::cout<<"after"<<std::endl;
             // std::cout<<"writing"<<std::endl;
-            image_acc[i] += (px>=1.0f? 0.0f: px);
-            exp_total[i] += (px>=1.0f? 0.0f: float(exp));
+            image_acc[i] += (px>=0.975f? 0.0f: px);
+            exp_total[i] += (px>=0.975f? 0.0f: float(exp));
         }
         //     }
 

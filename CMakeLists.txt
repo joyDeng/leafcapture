@@ -64,6 +64,15 @@ Serial.cpp
 AllivedCameras.h
 test_exp.cpp)
 
+add_executable(measure 
+Camera.h
+Capture.h
+Camera.cpp
+Serial.h
+Serial.cpp
+AllivedCameras.h
+measure.cpp)
+
 # add_executable(calibrate 
 # Camera.h
 # Capture.h
@@ -129,6 +138,13 @@ PUBLIC ${VIMBA_MES_INC_DIR}
 PUBLIC ${STB_INCLUDE} 
 PUBLIC ${OpenCV_INCLUDE_DIRS})
 
+target_include_directories(measure
+PUBLIC ${VIMBA_INC_DIR}
+PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
+PUBLIC ${VIMBA_MES_INC_DIR}
+PUBLIC ${STB_INCLUDE} 
+PUBLIC ${OpenCV_INCLUDE_DIRS})
+
 # target_include_directories(calibrate 
 # PUBLIC ${VIMBA_INC_DIR}
 # PUBLIC ${VIMBA_TRANSFORM_INC_DIR}
@@ -172,6 +188,17 @@ ${DC_LIBS}
 ${VIMBA_LIBS})
 
 target_link_libraries(saturate LINK_PUBLIC 
+${Boost_LIBRARIES} 
+${Boost_FILESYSTEM_LIBRARY}
+${Boost_SYSTEM_LIBRARY}
+usb-1.0
+glfw
+OpenGL
+${OpenCV_LIBS}
+${DC_LIBS}
+${VIMBA_LIBS})
+
+target_link_libraries(measure LINK_PUBLIC 
 ${Boost_LIBRARIES} 
 ${Boost_FILESYSTEM_LIBRARY}
 ${Boost_SYSTEM_LIBRARY}

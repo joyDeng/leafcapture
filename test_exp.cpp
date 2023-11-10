@@ -18,6 +18,7 @@ using namespace std;
 using namespace std::chrono;
 
 #define NUM_LIGHT 11
+#define MAX_EXP 2000000
 // void photomode1(Camera *camera){
 //     // ;
 //     // printf("sleep\n");
@@ -31,7 +32,7 @@ int measure_camera_light(string data_path, int cid, int lid){
     if(ret=='R');
 
     CameraC *m_camera = new CameraC();
-    float start_exp = 1000000;
+    float start_exp = MAX_EXP;
     if(m_camera->created){
         arduino.turnOn(lid);
         sleep(1);
@@ -90,7 +91,7 @@ int measure_all(string data_path){
     if(ret=='R');
 
     CameraC *m_camera = new CameraC();
-    float start_exp = 1000000;
+    float start_exp = MAX_EXP;
     if(m_camera->created){
         for (int light_id = 0; light_id < NUM_LIGHT ; light_id++){
             arduino.turnOn(light_id);
@@ -130,7 +131,7 @@ int main(int argc, char **argv){
     std::string DATA_ROOT = "/home/dx/Research/leaf/data/";
     std::string data_path = DATA_ROOT + fileprefix;
     boost::filesystem::create_directories(data_path);
-    if(operation > 0){
+    if(operation == 0){
         int camera_id = std::stoi(std::string(argv[2]));
         int light_id = std::stoi(std::string(argv[3]));
         std::cout<<"start to measure light"<<light_id<<" from camera "<<camera_id<<std::endl;

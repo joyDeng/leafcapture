@@ -28,9 +28,9 @@ map_bt_c1 = {
 }
 
 map_bt_c2 = {
-'57': 19,
-'47': 21,
-'37': 20,
+'57': 18,
+'47': 20,
+'37': 19,
 '56': 11,
 '46': 12,
 '36': 13,
@@ -165,12 +165,15 @@ def camera_approx(camera_, gpoint):
 
 
 def get_camera_tr(camera_):
-    imgsize, cm, dist = load_camera_intrinsic(camera_)
+    imgsize, cm, distort = load_camera_intrinsic(camera_)
+    # print("cm", cm)
+    cm[0][2] = 1296
+    cm[1][2] = 972
     sp, ip = load_spatial_and_image_point(camera_, global_ps)
     # cv2.calibrateCamera(sp, ip, imgsize)
     objpoints = [sp.reshape(-1, 3)]
     imgpoints = [ip.reshape(-1, 2)]
-    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, imgsize, cameraMatrix=cm, distCoeffs=dist, flags=cv2.CALIB_USE_INTRINSIC_GUESS)
+    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, imgsize, cameraMatrix=cm, distCoeffs=distort, flags=cv2.CALIB_USE_INTRINSIC_GUESS+cv2.CALIB_FIX_PRINCIPAL_POINT+cv2.CALIB_FIX_ASPECT_RATIO)
     # suc, rvecs, tvecs = cv2.solvePnP(objpoints, imgpoints, cm, dist, rvec=rvecs_guesses[camera_], tvec=tvecs_guesses[camera_], useExtrinsicGuess=False, flags=cv2.SOLVEPNP_ITERATIVE)
     print(f" ============= Camera {camera_} ================= ")
     print("rvecs: ", rvecs)
@@ -220,7 +223,15 @@ def get_camera_tr(camera_):
         # exit(0)
         error = cv2.norm(imgpoints[i].reshape(-1, 2), imgpoints2.reshape(-1, 2), cv2.NORM_L2)/len(imgpoints2)
         mean_error += error
-    print( "total error: {}".format(mean_error/len(objpoints)) )
+
+    mean_error_old = 0
+    for i in range(len(objpoints)):
+        imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[0], tvecs[0], cm, distort)
+        # print(imgpoints[i].shape, imgpoints2.shape)
+        # exit(0)
+        error = cv2.norm(imgpoints[i].reshape(-1, 2), imgpoints2.reshape(-1, 2), cv2.NORM_L2)/len(imgpoints2)
+        mean_error_old += error
+    print( f"total new error: {mean_error/len(objpoints)}, old {mean_error_old/len(objpoints)}")
 
     camera_dict = {}
     camera_dict['name'] = camera_
@@ -252,7 +263,7 @@ with open(DATA_DIR+'/sys_camera.json', 'w') as camerafile:
 
 # mark the image
 
-# camera = "c0"
+# camera = "c2"
 
 # frame = cv2.imread(DATA_DIR+f"/{camera}/{camera}_aruco_2.png", cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
 # arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
@@ -263,15 +274,15 @@ with open(DATA_DIR+'/sys_camera.json', 'w') as camerafile:
 
 # markerCorners, markerIds, rejectedCandidates = detector.detectMarkers(frame)
 
-# valid_c0 = [26, 25, 22, 9, 8, 34, 3, 2]
-# valid_c1 = [16, 17, 12, 13, 5, 6]
-# valid_c2 = [19, 21, 20, 11, 12, 13, 4, 3, 5]
+# # valid_c0 = [26, 25, 22, 9, 8, 34, 3, 2]
+# # valid_c1 = [16, 17, 12, 13, 5, 6]
+# valid_c2 = [18, 19, 20, 11, 12, 13, 4, 3, 5]
 
 
 
 # with open(DATA_DIR+f"/{camera}_data.log", "w") as file:
 #     for i in range(len(rejectedCandidates)):
-#         if i in valid_c0:
+#         if i in valid_c2:
 #             # print(rejectedCandidates[i])
 #             (topLeft, topRight, bottomRight, bottomLeft) = rejectedCandidates[i][0]
 

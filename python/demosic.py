@@ -1,7 +1,7 @@
-from cmath import isnan
-from configparser import Interpolation
-from ctypes import alignment, resize
-from fileinput import filename
+# from cmath import isnan
+# from configparser import Interpolation
+# from ctypes import alignment, resize
+# from fileinput import filename
 from matplotlib.axis import Axis
 import numpy as np
 import os
@@ -44,6 +44,15 @@ class RawImage:
             if filename.find("rgb") != -1:
                 self.demos[filename] = cv2.imread(folder + "/" + filename, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
     
+    def color2white(self, fname, red, blue):
+        my_images = self.demos[fname]
+        white_images = np.zeros(my_images.shape, dtype=np.float32)
+        white_images[:, :, 0] = my_images[:, :, 0] * red
+        white_images[:, :, 2] = my_images[:, :, 2] * blue
+        white_images[:, :, 1] = my_images[:, :, 1]
+        return white_images
+        
+
 
     def bw2color(self, method="bi"):
         if method == "bi":
@@ -54,6 +63,7 @@ class RawImage:
         for pairs in self.monos.items():
             fname = pairs[0].replace("mono", "rgb_{}".format(method))
             self.demos[fname] = demo_fuc(pairs[1])
+            self.demos[fname] = self.color2white(fname, 1.20922596, 0.80218527)
             cv2.imwrite(self.folder + "/" + fname, self.demos[fname])
 
 
@@ -84,8 +94,8 @@ class RawImage:
         print(w, h)
 
         resized = cv2.resize(img2, (h, w), interpolation=cv2.INTER_LINEAR)
-        cv2.imwrite(self.folder+"/"+"overview.hdr", resized)
-        cv2.imwrite(self.folder+"/"+"full.hdr",img2)
+        cv2.imwrite(self.folder+"/"+"overview_w.hdr", resized)
+        cv2.imwrite(self.folder+"/"+"full_w.hdr",img2)
 
             
 

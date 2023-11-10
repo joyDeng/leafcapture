@@ -67,7 +67,6 @@ light_dict_correction = {}
 def white_balance_status(camera_id):
     for l in light_dict[camera_id]:
         image_name = "{}/color_cali_{}/c{}_l{}_hdrDebevec.hdr".format(DATA_ROOT, up_down[camera_id], camera_id, l)
-        # print(image_name)
         image = cv2.imread(image_name, cv2.IMREAD_UNCHANGED)
         colors_regularized = []
         for i in range(6):
@@ -75,14 +74,10 @@ def white_balance_status(camera_id):
             b_color = image[ color_box[1] : color_box[3], color_box[0] : color_box[2]:]
             b_sum_0 = np.sum(b_color, axis=0)
             b_sum = np.sum(b_sum_0, axis=0)
-            # print(b_sum)
             b_regular = b_sum / b_sum[1].reshape(-1, 1)
             colors_regularized.append(b_regular)
-            # check 
-            # cv2.imwrite("{}/color_cali_{}/c{}_l{}_b{}.hdr".format(DATA_ROOT, up_down[camera_id], camera_id, l, i), b_color)
-        # print()
+            
         colors_regularized = np.array(colors_regularized).reshape(-1, 3)
-        # exit(0)
         RA = np.vstack([np.array(colors_regularized)[:, 0], np.zeros(6)]).T
         Rm, Rc = np.linalg.lstsq(RA, ref_colors_regularized[:, 0], rcond=None)[0]
 
